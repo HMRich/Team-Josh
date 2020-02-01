@@ -3,19 +3,19 @@ package app;
 import java.util.*;
 
 public class Trie {
-	
-	private static char[][] digists = {['a', 'b', 'c'],
-			['d', 'e', 'f'],
-			['g', 'h', 'i']};
+
+	private static char[][] keypad = { { 'a', 'b', 'c' }, { 'd', 'e', 'f' }, { 'g', 'h', 'i' }, { 'j', 'k', 'l' },
+			{ 'm', 'n', 'o' }, { 'p', 'q', 'r', 's' }, { 't', 'u', 'v' }, { 'w', 'x', 'y', 'z' } };
 
 	private class Node {
-		char char1;
-		char char2;
-		char char3;
-		char char4;
+		char data;
+		Node char1;
+		Node char2;
+		Node char3;
+		Node char4;
 		boolean aword;
-		
-		private Node(char[]chars) {
+
+		private Node(char ch) {
 			char1 = chars[0];
 			char2 = chars[1];
 			char3 = chars[2];
@@ -46,6 +46,20 @@ public class Trie {
 
 	public void printSorted() {
 		printSorted(root, "");
+	}
+
+	public ArrayList<String> printAllPaths() {
+		ArrayList<String> paths = new ArrayList<String>();
+		ArrayList<Character> path = new ArrayList<Character>();
+		gatherAllPaths(root, path, paths);
+		return words;
+	}
+
+	private void gatherAllPaths(Node node, ArrayList<Character> path, ArrayList<String> paths) {
+		if (node == null) {
+			return;
+		}
+		paths.add(path.toString().replaceAll("", ""))
 	}
 
 	private void printSorted(Node node, String s) {
