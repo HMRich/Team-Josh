@@ -4,112 +4,141 @@ import java.util.*;
 
 public class Trie {
 
-	private static char[][] keypad = { { 'a', 'b', 'c' }, { 'd', 'e', 'f' }, { 'g', 'h', 'i' }, { 'j', 'k', 'l' },
-			{ 'm', 'n', 'o' }, { 'p', 'q', 'r', 's' }, { 't', 'u', 'v' }, { 'w', 'x', 'y', 'z' } };
+	// ----------------------------------------------------------------------------------------------------
+
+	private static Character[][] keypad = { //
+			{}, // 0 empty
+			{}, // 1 empty
+			{ 'a', 'b', 'c' }, // 2
+			{ 'd', 'e', 'f' }, // 3
+			{ 'g', 'h', 'i' }, // 4
+			{ 'j', 'k', 'l' }, // 5
+			{ 'm', 'n', 'o' }, // 6
+			{ 'p', 'q', 'r', 's' }, // 7
+			{ 't', 'u', 'v' }, // 8
+			{ 'w', 'x', 'y', 'z' } // 9
+	};
+
+	// ----------------------------------------------------------------------------------------------------
 
 	private class Node {
-		char data;
-		Node char1;
-		Node char2;
-		Node char3;
-		Node char4;
-		boolean aword;
+		Character data;
+		Node[] chars;
 
-		private Node(char ch) {
-			char1 = chars[0];
-			char2 = chars[1];
-			char3 = chars[2];
-			char4 = chars.length == 4 ? chars[3] : null;
+		private Node() {
+			data = null;
+			chars = new Node[4];
+		}
+
+		private Node(Character ch) {
+			this();
+			data = ch;
+		}
+
+		private void putChar(Character ch, int index) {
+			switch (index) {
+			case 0:
+				chars[0] = new Node(ch);
+				break;
+			case 1:
+				chars[1] = new Node(ch);
+				break;
+			case 2:
+				chars[2] = new Node(ch);
+				break;
+			case 3:
+				chars[3] = new Node(ch);
+				break;
+			default:
+				throw new IllegalStateException("index was below 1 or above 4.");
+			}
+		}
+
+		private Node getCharNode(int index) {
+			switch (index) {
+			case 0:
+				return chars[0];
+			case 1:
+				return chars[1];
+			case 2:
+				return chars[2];
+			case 3:
+				return chars[3];
+			default:
+				throw new IllegalStateException("index was below 1 or above 4.");
+			}
+		}
+
+		@Override
+		public String toString() {
+			return data.toString();
 		}
 	}
+
+	// ----------------------------------------------------------------------------------------------------
 
 	private Node root;
+	private ArrayList<String> paths;
 
 	public Trie() {
-		this.root = null;
+		this.root = new Node();
 	}
 
-	public void insertString(String s) {
-		insertString(root, s);
-	}
+	// ----------------------------------------------------------------------------------------------------
 
-	private void insertString(Node root, String s) {
-		Node cur = root;
-		for (char ch : s.toCharArray()) {
-			Node next = cur.children.get(ch);
-			if (next == null)
-				cur.children.put(ch, next = new Node());
-			cur = next;
+	public void buildTrie(int[] input) {
+		ArrayList<Integer> cleanedInput = cleanInput(input);
+		if (!inputIsValid(cleanedInput)) {
+			throw new IllegalArgumentException("Input cannot have a value less that one or greater than 9.");
 		}
-		cur.aword = true;
-	}
-
-	public void printSorted() {
-		printSorted(root, "");
-	}
-
-	public ArrayList<String> printAllPaths() {
-		ArrayList<String> paths = new ArrayList<String>();
 		ArrayList<Character> path = new ArrayList<Character>();
-		gatherAllPaths(root, path, paths);
-		return words;
+		buildTrie(cleanedInput, root, path);
+	}
+	
+	public ArrayList<String> getAllPaths() {
+		return paths;
 	}
 
-	private void gatherAllPaths(Node node, ArrayList<Character> path, ArrayList<String> paths) {
-		if (node == null) {
-			return;
+	private void buildTrie(ArrayList<Integer> input, Node node, ArrayList<Character> path) {
+		if (input.size() == 0) {
+			paths.add(arrayListToString(path));
 		}
-		paths.add(path.toString().replaceAll("", ""))
-	}
-
-	private void printSorted(Node node, String s) {
-		if (node.aword) {
-			System.out.println(s);
+		if(node.data != null) {
+			path.add(node.data);
 		}
-		for (Character ch : node.children.keySet()) {
-			printSorted(node.children.get(ch), s + ch);
+		Character[] possibleCharacters = keypad[input.get(0)];
+		input.remove(0);
+		int index = 0;
+		for (Character data : possibleCharacters) {
+			node.putChar(data, index);
+			buildTrie(new ArrayList<Integer>(input), node.getCharNode(index), new ArrayList<Character>(path));
+			index++;
 		}
 	}
 
-	public boolean findWord(String s) {
-		return findWord(root, s);
-	}
-
-	private boolean findWord(Node node, String s) {
-		if (s != null) {
-			String rest = s.substring(1); // rest is a substring of s, by excluding the first character in s
-			char ch = s.charAt(0); // ch is the first letter of s
-			Node child = node.children.get(ch); // return the child that ch associated with.
-			if (s.length() == 1 && child != null) // if s contains only one letter, and current node has a child
-													// associated with that letter, we find the prefix in Trie!
-				return true; // base case
-			if (child == null)
+	private boolean inputIsValid(ArrayList<Integer> input) {
+		for (Integer data : input) {
+			if (data < 2 || data > 9) {
 				return false;
-			else
-				return findWord(child, rest); // recursive, In this way, we follow the path of the trie from root down
-												// towards leaf
+			}
 		}
-		return false;
+		return true;
+	}
+	
+	private ArrayList<Integer> cleanInput(int[] input) {
+		ArrayList<Integer> cleanedInput = new ArrayList<Integer>();
+		for(int data : input) {
+			cleanedInput.add(data);
+		}
+		return cleanedInput;
+	}
+	
+	private String arrayListToString(ArrayList<Character> path) {
+		String convertedPath = "";
+		for(Character data : path) {
+			convertedPath = convertedPath.concat(data.toString());
+		}
+		return convertedPath;
 	}
 
-	// Usage example
-	public static void main(String[] args) {
-
-		Trie2 tr = new Trie2();
-
-		tr.insertString("hello");
-		tr.insertString("world");
-		tr.insertString("hi");
-		tr.insertString("ant");
-		tr.insertString("an");
-
-		System.out.println(tr.findWord("ant"));
-		System.out.println(tr.findWord("an"));
-		System.out.println(tr.findWord("hello"));
-		System.out.println(tr.findWord("cant"));
-		System.out.println(tr.findWord("hig"));
-		System.out.println(tr.findWord("he"));
-
-		tr.printSorted();
-	}
 }
