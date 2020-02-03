@@ -82,6 +82,7 @@ public class Trie {
 
 	public Trie() {
 		this.root = new Node();
+		this.paths = new ArrayList<String>();
 	}
 
 	// ----------------------------------------------------------------------------------------------------
@@ -102,6 +103,7 @@ public class Trie {
 	private void buildTrie(ArrayList<Integer> input, Node node, ArrayList<Character> path) {
 		if (input.size() == 0) {
 			paths.add(arrayListToString(path));
+			return;
 		}
 		if(node.data != null) {
 			path.add(node.data);
