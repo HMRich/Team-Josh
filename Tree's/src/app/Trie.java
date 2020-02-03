@@ -95,18 +95,18 @@ public class Trie {
 		ArrayList<Character> path = new ArrayList<Character>();
 		buildTrie(cleanedInput, root, path);
 	}
-	
+
 	public ArrayList<String> getAllPaths() {
 		return paths;
 	}
 
 	private void buildTrie(ArrayList<Integer> input, Node node, ArrayList<Character> path) {
-		if (input.size() == 0) {
-			paths.add(arrayListToString(path));
-			return;
-		}
-		if(node.data != null) {
+		if (node.data != null) {
 			path.add(node.data);
+			if (input.size() == 0) {
+				paths.add(arrayListToString(path));
+				return;
+			}
 		}
 		Character[] possibleCharacters = keypad[input.get(0)];
 		input.remove(0);
@@ -126,18 +126,18 @@ public class Trie {
 		}
 		return true;
 	}
-	
+
 	private ArrayList<Integer> cleanInput(int[] input) {
 		ArrayList<Integer> cleanedInput = new ArrayList<Integer>();
-		for(int data : input) {
+		for (int data : input) {
 			cleanedInput.add(data);
 		}
 		return cleanedInput;
 	}
-	
+
 	private String arrayListToString(ArrayList<Character> path) {
 		String convertedPath = "";
-		for(Character data : path) {
+		for (Character data : path) {
 			convertedPath = convertedPath.concat(data.toString());
 		}
 		return convertedPath;
