@@ -62,6 +62,53 @@ public class Trie2 {
 		return false;
 	}
 
+	public ArrayList<String> wordsPrefixedBy(String findString) {
+		ArrayList<Character> path = new ArrayList<Character>();
+		ArrayList<String> result = new ArrayList<String>();
+		return wordsPrefixedBy(root, findString, path, result);
+	}
+
+	private ArrayList<String> wordsPrefixedBy(TrieNode node, String findString, ArrayList<Character> path,
+			ArrayList<String> result) {
+
+		for (int i = 0; i < findString.length(); i++) {
+			Character letter = findString.charAt(i);
+			if (node.children.containsKey(letter)) {
+				node = node.children.get(letter);
+				path.add(letter);
+				if (node.aword) {
+					result.add(arrayListToString(path));
+				}
+			} else {
+				result = getAllWords(node, path, result);
+				break;
+			}
+		}
+
+		return result = getAllWords(node, path, result);
+	}
+
+	private ArrayList<String> getAllWords(TrieNode node, ArrayList<Character> path,
+			ArrayList<String> result) {
+		node.children.forEach((character, trieNode) -> {
+			path.add(character);
+			if(trieNode.aword) {
+				result.add(arrayListToString(path));
+			}
+			getAllWords(trieNode, path, result);
+			path.remove(character);
+		});
+		return result;
+	}
+
+	private String arrayListToString(ArrayList<Character> path) {
+		String convertedPath = "";
+		for (Character data : path) {
+			convertedPath = convertedPath.concat(data.toString());
+		}
+		return convertedPath;
+	}
+
 	public static void main(String[] args) {
 
 		Trie2 tr = new Trie2();
